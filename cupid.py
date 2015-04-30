@@ -24,8 +24,9 @@ def cupid(file):
     json_filename = 'station.json'
     print('Saving the file', json_filename)
     jsonf = open(json_filename, 'w')
-    data = json.dumps({r['Station Name']: r['Code'] for r in csv_reader})
-    jsonf.write(data)
+    data = {r['Station Name']: r['Code'] for r in csv_reader}
+    redata = json.dumps(data, indent=4, sort_keys=True)
+    jsonf.write(redata)
     e.close()
     jsonf.close()
 
