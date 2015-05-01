@@ -2,25 +2,29 @@ __author__ = 'OliPicard'
 import csv
 import json
 import sys
-
+import requests
 
 '''a csv to json converter written for the UKStationLive schema
 run this tool via cmd> cupid.py station.csv
 Thank you to the following
 '''
 
-
-
-def cupid(file):
-    csv_file = file[0]
-    print("Opening the CSV file.")
+def cupid():
+    csv_file = requests.get('http://www.nationalrail.co.uk/static/documents/content/station_codes.csv', stream=True)
+    if csv_file.status_code == requests.codes.ok:
+        print("Grabbing file from National Rail")
+        with open('station_codes.csv', 'wb') as e:
+            for chunk in csv_file.iter_content(chunk_size=1024):
+                if chunk:
+                    e.write(chunk)
+                    e.flush()
     try:
-        e = open(csv_file, 'r')
+        t = open('station_codes.csv', 'r')
     except IOError:
-        print('It seems that the file hasnt been located')
+        print('Unable to get data. delete the file and try again!')
         sys.exit()
     headers = ['Station Name', 'Code']
-    csv_reader = csv.DictReader(e, headers)
+    csv_reader = csv.DictReader(t, headers)
     json_filename = 'station.json'
     print('Saving the file', json_filename)
     jsonf = open(json_filename, 'w')
@@ -31,4 +35,4 @@ def cupid(file):
     jsonf.close()
 
 if __name__ == "__main__":
-    cupid(sys.argv[1:])
+    cupid()
